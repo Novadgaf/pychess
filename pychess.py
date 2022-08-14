@@ -10,7 +10,8 @@ class Pychess():
     def __init__(self) -> None:    
         self.WIDTH = 640
         self.HEIGHT = 640
-        self.chessboard_array = [[None for x in range(8)] for y in range(8)] 
+        self.SQUARE_SIZE = 80
+        self.chessboard_array: Figure = [[None for x in range(8)] for y in range(8)] 
         self.main()
 
     def main(self):
@@ -18,8 +19,8 @@ class Pychess():
         main main function to run the game
         """
         self.setup_pygame()
+        self.chessboard = Chessboard(self.CHESSBOARD_LAYER)
         self.draw_initial_setup()
-        chessboard = Chessboard(self.CHESSBOARD_LAYER)
         self.update_win()
         while True:
             for event in pygame.event.get():
@@ -27,7 +28,7 @@ class Pychess():
                     pygame.quit()
                     sys.exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    chessboard.mouse_left_clicked(event)
+                    self.left_click(event)
             self.update_win()
 
     def setup_pygame(self):
@@ -81,3 +82,31 @@ class Pychess():
         self.WIN.blit(self.CHESSBOARD_LAYER,(0,0))
         self.WIN.blit(self.FIGURE_LAYER,(0,0))
         pygame.display.update()
+
+    def left_click(self, event: pygame.event):
+        x,y = event.pos
+        cord_y, cord_x = int(y/self.SQUARE_SIZE), int(int(x/self.SQUARE_SIZE))
+        self.chessboard.mouse_left_clicked(cord_y, cord_x)
+
+        if self.chessboard_array[cord_y][cord_x] != None:
+            print("clicked figure at cord:")
+            self.selected_y_x = (cord_y, cord_x)
+            print(self.selected_y_x)
+        elif self.selected_y_x != None:
+            print("clicked empty space after clicking figure")
+            piece_cord_y, piece_cord_x = self.selected_y_x
+            print(f"figure at pos {piece_cord_y}, {piece_cord_x}")
+            step_y_x = (cord_y-piece_cord_y, cord_x-piece_cord_x)
+            print(f"trying to move {step_y_x}")
+            piece = self.chessboard_array[piece_cord_y][piece_cord_x]
+            print(f"found piece {piece}")
+
+            for move in piece.moves():
+                print(f"trying move {move}")
+                if move == step_y_x:
+                    print("moving!!")
+                    piece.move_figure(step_y_x[0], step_y_x[1])
+            self.selected_y_x = None
+        else:
+            print("Nothing selected before")
+            

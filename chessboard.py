@@ -33,30 +33,30 @@ class Chessboard:
             count -= 1
         pygame.display.update()
 
-    def draw_rect(self, color, x_cord: int, y_cord: int):
+    def draw_rect(self, color, cord_y: int, cord_x: int):
         """
         draw_rect draws a rectangle on the board with specific color
 
         :param color: color of the rectangle
         :type color: rgb tuple or hex str
-        :param x_cord: x cord of rectangle (0-7)
-        :type x_cord: int
-        :param y_cord: y cord of rectangle (0-7)
-        :type y_cord: int
+        :param cord_y: y cord of rectangle (0-7)
+        :type cord_y: int
+        :param cord_x: x cord of rectangle (0-7)
+        :type cord_x: int
         """
-        pygame.draw.rect(self.SURFACE, color, [self.SQUARE_SIZE*x_cord, self.SQUARE_SIZE*y_cord, self.SQUARE_SIZE, self.SQUARE_SIZE])
+        pygame.draw.rect(self.SURFACE, color, [self.SQUARE_SIZE*cord_x, self.SQUARE_SIZE*cord_y, self.SQUARE_SIZE, self.SQUARE_SIZE])
 
-    def mouse_left_clicked(self, event: pygame.event):
+    def mouse_left_clicked(self, cord_y: int, cord_x: int):
         """
         mouse_left_clicked colors the clicked rectangle in a yellow color to visualize the click
 
-        :param event: event that happened
-        :type event: pygame.event
+        :param y_cord: y cord of click
+        :type y_cord: int
+        :param x_cord: x cord of click
+        :type x_cord: int
         """
         self.create_board()
-        x,y = event.pos
-        x_cord, y_cord = int(x/self.SQUARE_SIZE), int(int(y/self.SQUARE_SIZE))
-        self.draw_rect("#C19C4D", x_cord, y_cord)
+        self.draw_rect("#C19C4D", cord_y, cord_x)
         pygame.display.update()
 
 
