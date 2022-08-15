@@ -1,11 +1,12 @@
 from msilib.schema import Error
+from typing import Tuple
 import pygame
 
 class Figure():
     """
     Figure super class for every figure
     """
-    def __init__(self, surface: pygame.Surface, color: str, cord_y: int = 0, cord_x: int = 0) -> None:
+    def __init__(self, surface: pygame.Surface, color: str, cord_y: int = 0, cord_x: int = 0, can_move_multiple_squares: bool = False, can_jump: bool = False) -> None:
         self.SURFACE = surface
         self.SQUARE_SIZE = 80
         self.COLOR = color
@@ -14,6 +15,11 @@ class Figure():
         self.cord_x = cord_x
         self.image_path = None
         self.moved = False
+
+        # e.g bishop, queen, rook
+        self.can_move_multiple_squares = can_move_multiple_squares
+        # can jump (knight)
+        self.can_jump = can_jump
     
     def setup_figure_drawing(self):
         self.img = pygame.image.load(self.image_path)
@@ -45,9 +51,17 @@ class Figure():
         self.cord_y += cord_y
         self.cord_x += cord_x
 
-        self.draw_figure()
+        self.SURFACE.fill(pygame.Color(0,0,0,0))
         self.moved = True
-        pygame.display.update()
+
+    def get_cords(self) -> Tuple:
+        """
+        get_cords returns position (y,x)
+
+        :return: y,x position of figure
+        :rtype: Tuple
+        """
+        return (self.cord_y, self.cord_x)
         
 
 class Pawn(Figure):
@@ -63,17 +77,20 @@ class Pawn(Figure):
         self.setup_figure_drawing()
         self.draw_figure()
 
-    def moves(self) -> list[tuple]:
+    def moves(self, capture_move: bool) -> list[tuple]:
         """
         move possible minimal movement of figure
 
         :return: list of min x,y move value
         :rtype: list[tuple]
         """
-        if self.moved:
-            return [(1,0)]
+        print(self.moved)
+        if capture_move:
+            return [(-1,1), (-1,-1)]
+        elif not self.moved:
+            return [(-2,0), (-1,0)]
         else:
-            return [(2,0)]
+            return [(-1,0)]
 
 class Rook(Figure):
     """
@@ -83,7 +100,7 @@ class Rook(Figure):
     :type Figure: Figure
     """
     def __init__(self, surface: pygame.Surface, color: str, cord_y: int = 0, cord_x: int = 0) -> None:
-        super().__init__(surface, color, cord_y, cord_x)
+        super().__init__(surface, color, cord_y, cord_x, True)
         self.image_path = fr"images/{color}_rook.png"
         self.setup_figure_drawing()
         self.draw_figure()
@@ -105,7 +122,7 @@ class Knight(Figure):
     :type Figure: Figure
     """
     def __init__(self, surface: pygame.Surface, color: str, cord_y: int = 0, cord_x: int = 0) -> None:
-        super().__init__(surface, color, cord_y, cord_x)
+        super().__init__(surface, color, cord_y, cord_x, can_jump= True)
         self.image_path = fr"images/{color}_knight.png"
         self.setup_figure_drawing()
         self.draw_figure()
@@ -128,7 +145,7 @@ class Bishop(Figure):
     :type Figure: Figure
     """
     def __init__(self, surface: pygame.Surface, color: str, cord_y: int = 0, cord_x: int = 0) -> None:
-        super().__init__(surface, color, cord_y, cord_x)
+        super().__init__(surface, color, cord_y, cord_x, True)
         self.image_path = fr"images/{color}_bishop.png"
         self.setup_figure_drawing()
         self.draw_figure()
@@ -150,7 +167,7 @@ class Queen(Figure):
     :type Figure: Figure
     """
     def __init__(self, surface: pygame.Surface, color: str, cord_y: int = 0, cord_x: int = 0) -> None:
-        super().__init__(surface, color, cord_y, cord_x)
+        super().__init__(surface, color, cord_y, cord_x, True)
         self.image_path = fr"images/{color}_queen.png"
         self.setup_figure_drawing()
         self.draw_figure()
